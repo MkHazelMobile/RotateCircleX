@@ -3,10 +3,10 @@ name: Android CI
 on:
   push:
     branches:
-      - master
+      - main
   pull_request:
     branches:
-      - master
+      - main
 
 jobs:
   build:
@@ -42,6 +42,10 @@ jobs:
         with:
           api-level: 33
           build-tools: 33.0.0
+
+      # Fix permission issue with gradlew
+      - name: Make gradlew executable
+        run: chmod +x ./gradlew
 
       # Build Debug APK
       - name: Build Debug APK
