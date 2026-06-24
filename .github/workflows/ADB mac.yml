@@ -1,4 +1,4 @@
-name: Android ADB
+name: Android MAC
 
 on:
   workflow_dispatch:
