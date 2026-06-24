@@ -1,4 +1,4 @@
-name: ADB Test
+name: ADB via Tailscale
 
 on:
   workflow_dispatch:
@@ -8,12 +8,31 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Connect to Tailscale
+        uses: tailscale/github-action@v3
+        with:
+          authkey: ${{ secrets.TS_AUTHKEY }}
+
       - name: Install ADB
         run: |
           sudo apt-get update
           sudo apt-get install -y android-sdk-platform-tools
 
+      - name: Debug Tailscale
+        run: |
+          tailscale ip
+          tailscale status
+          ping -c 4 100.78.43.75 || true
+
+      - name: Check ADB Port
+        run: |
+          nc -vz 100.78.43.75 5555 || true
+
       - name: Connect ADB
         run: |
           adb connect 100.78.43.75:5555
           adb devices
+
+      - name: Run ADB Command
+        run: |
+          adb shell getprop ro.product.model
