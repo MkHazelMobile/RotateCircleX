@@ -1,0 +1,4 @@
+- name: Connect ADB
+  run: |
+    adb connect 100.78.43.75:5555
+    adb devices
