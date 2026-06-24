@@ -1,4 +1,19 @@
-- name: Connect ADB
-  run: |
-    adb connect 100.78.43.75:5555
-    adb devices
+name: ADB Test
+
+on:
+  workflow_dispatch:
+
+jobs:
+  adb:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Install ADB
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y android-sdk-platform-tools
+
+      - name: Connect ADB
+        run: |
+          adb connect 100.78.43.75:5555
+          adb devices
