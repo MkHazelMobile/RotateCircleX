@@ -1,4 +1,4 @@
-name: ADB via Tailscale
+name: Android ADB
 
 on:
   workflow_dispatch:
@@ -8,7 +8,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Connect to Tailscale
+      - name: Connect Tailscale
         uses: tailscale/github-action@v3
         with:
           authkey: ${{ secrets.TS_AUTHKEY }}
@@ -16,23 +16,43 @@ jobs:
       - name: Install ADB
         run: |
           sudo apt-get update
-          sudo apt-get install -y android-sdk-platform-tools
+          sudo apt-get install -y android-sdk-platform-tools netcat-openbsd
 
-      - name: Debug Tailscale
+      - name: Restore ADB Key
         run: |
-          tailscale ip
-          tailscale status
-          ping -c 4 100.78.43.75 || true
+          mkdir -p ~/.android
+          printf "%s" "${{ secrets.ADB_PRIVATE_KEY }}" > ~/.android/adbkey
+          chmod 600 ~/.android/adbkey
 
-      - name: Check ADB Port
+      - name: Restart ADB
         run: |
-          nc -vz 100.78.43.75 5555 || true
+          adb kill-server || true
+          adb start-server
 
-      - name: Connect ADB
+      - name: Check Connectivity
+        run: |
+          ping -c 3 100.78.43.75 || true
+          nc -vz 100.78.43.75 5555
+
+      - name: Connect Device
         run: |
           adb connect 100.78.43.75:5555
-          adb devices
+          adb devices -l
 
-      - name: Run ADB Command
+      - name: Device Model
         run: |
           adb shell getprop ro.product.model
+
+      - name: Android Version
+        run: |
+          adb shell getprop ro.build.version.release
+
+      - name: Screenshot
+        run: |
+          adb exec-out screencap -p > screenshot.png
+
+      - name: Upload Screenshot
+        uses: actions/upload-artifact@v4
+        with:
+          name: screenshot
+          path: screenshot.png
