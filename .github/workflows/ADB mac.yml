@@ -40,4 +40,3 @@ steps:
     with:
       name: android-screenshot
       path: screenshot.png
-```
