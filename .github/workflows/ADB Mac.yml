@@ -1,0 +1,42 @@
+name: Android ADB
+
+on:
+workflow_dispatch:
+
+jobs:
+adb:
+runs-on: [self-hosted, macOS]
+
+steps:
+  - name: Show runner info
+    run: |
+      uname -a
+      whoami
+
+  - name: Check ADB installation
+    run: |
+      which adb
+      adb version
+
+  - name: List devices
+    run: |
+      adb start-server
+      adb devices -l
+
+  - name: Show device model
+    run: |
+      adb shell getprop ro.product.model
+
+  - name: Show Android version
+    run: |
+      adb shell getprop ro.build.version.release
+
+  - name: Screenshot
+    run: |
+      adb exec-out screencap -p > screenshot.png
+
+  - name: Upload screenshot
+    uses: actions/upload-artifact@v4
+    with:
+      name: android-screenshot
+      path: screenshot.png
