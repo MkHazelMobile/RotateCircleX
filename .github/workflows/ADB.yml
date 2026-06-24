@@ -1,4 +1,4 @@
-name: Android ADB
+name: Android ADB with Tailscale
 
 on:
   workflow_dispatch:
